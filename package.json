@@ -1,0 +1,14 @@
+{
+  "name": "dhikr-autopilot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Makes a dhikr counter video and posts it to YouTube on a schedule.",
+  "scripts": {
+    "gate": "node scripts/gate.mjs",
+    "make": "node scripts/make.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}
