@@ -1,0 +1,32 @@
+{
+  "enabled": true,
+  "everyHours": 2,
+  "maxUploadsPerDay": 6,
+  "privacy": "public",
+  "zikarPerVideo": 3,
+  "countPerZikar": 15,
+  "secondsPerBead": 1,
+  "resolution": 720,
+  "brand": "",
+  "randomizeStyle": true,
+  "style": {
+    "scene": "tasbih",
+    "look": "night",
+    "sfx": "bead",
+    "theme": "auto"
+  },
+  "disabledIds": [],
+  "tags": [
+    "dhikr",
+    "zikar",
+    "islamic",
+    "tasbih",
+    "shorts",
+    "remembrance"
+  ],
+  "llm": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "maxArabicChars": 70
+}
