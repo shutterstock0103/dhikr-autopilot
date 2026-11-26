@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dhikr Video Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300;1,400&family=Noto+Naskh+Arabic:wght@400;500;600&family=Scheherazade+New:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ee; --card:#ffffff; --ink:#1f2421; --mute:#6b726d; --line:#e3e0d8;
+  --accent:#1f6b55; --accent-ink:#fff; --gold:#b98a45; --danger:#b3412f;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15191a; --card:#1e2425; --ink:#ecefec; --mute:#94a09a; --line:#2f3837;
+    --accent:#3fa184; --accent-ink:#0b1210; --gold:#d3a85f; --danger:#e07b67;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.app{max-width:1180px;margin:0 auto;padding:20px 16px 48px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:24px;align-items:start}
+@media(max-width:900px){.app{grid-template-columns:1fr}}
+h1{font-size:22px;font-weight:600;margin:4px 0 4px;letter-spacing:-.01em}
+.lead{color:var(--mute);margin:0 0 18px}
+.zcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.zhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.zhead .num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:12px;font-weight:600;flex:none}
+.zhead .sp{flex:1}
+.ibtn{border:1px solid var(--line);background:transparent;color:var(--mute);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;line-height:1}
+.ibtn:hover{color:var(--ink);border-color:var(--mute)}
+.ibtn:disabled{opacity:.35;cursor:default}
+label{display:block;font-size:12px;color:var(--mute);margin:8px 0 4px;font-weight:500}
+textarea,input[type=text],input[type=number],select{width:100%;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 11px;font:inherit}
+textarea:focus,input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+textarea.ar{font-family:Amiri,"Noto Naskh Arabic","Traditional Arabic",serif;font-size:26px;line-height:1.7;direction:rtl;text-align:center;resize:vertical;min-height:84px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 110px 1fr;gap:10px}
+@media(max-width:520px){.row3{grid-template-columns:1fr 1fr}.row3>:first-child{grid-column:1/-1}}
+.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.wide{width:100%}
+details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:14px}
+summary{cursor:pointer;font-weight:600}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--ink);font-size:14px}
+.chk input{width:auto}
+.stage{position:sticky;top:12px}
+@media(max-width:900px){.stage{position:static}}
+.cwrap{background:#000;border-radius:16px;overflow:hidden;aspect-ratio:9/16;width:100%;max-width:380px;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+canvas{width:100%;height:100%;display:block}
+.scrub{margin:12px auto 0;max-width:380px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.meta{display:flex;justify-content:space-between;color:var(--mute);font-size:12.5px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:380px;margin:12px auto 0}
+.status{max-width:380px;margin:10px auto 0;color:var(--mute);font-size:13px;min-height:20px}
+.status b{color:var(--ink)}
+.result{max-width:380px;margin:14px auto 0;display:none}
+.result video{width:100%;border-radius:12px;background:#000}
+.result a{display:block;text-align:center;text-decoration:none;margin-top:10px}
+.note{font-size:12.5px;color:var(--mute);margin-top:8px}
+.sectitle{font-weight:600;margin:0 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+.sectitle small{font-weight:400;color:var(--mute);font-size:12px}
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media(max-width:620px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tile{border:2px solid var(--line);background:transparent;border-radius:12px;padding:4px;cursor:pointer;color:var(--ink);font:inherit;display:flex;flex-direction:column;gap:4px;align-items:center}
+.tile canvas{width:100%;aspect-ratio:9/16;border-radius:8px;display:block;background:#222}
+.tile span{font-size:11.5px;line-height:1.2;text-align:center;padding-bottom:2px}
+.tile.on{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.swatches{display:flex;flex-wrap:wrap;gap:9px}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid var(--card);outline:1px solid var(--line);cursor:pointer;padding:0}
+.sw.on{outline:2.5px solid var(--accent)}
+.sw.auto{background:conic-gradient(#1d1b33,#0f3b31,#3b2410,#10295c,#4b1427,#2e175c,#1d1b33)}
+</style>
+</head>
+<body>
+<div class="app">
+  <section>
+    <h1>Dhikr Video Maker</h1>
+    <p class="lead">Type the Arabic zikar and its translation. The app builds a vertical tasbih counting video: beads slide, a click sounds for each count, and a chime plays when the count completes.</p>
+    <div class="zcard" id="style">
+      <div class="sectitle">Scene <small>pick a look for the whole video</small></div>
+      <div class="tiles" id="sceneTiles"></div>
+      <div class="row" style="margin-top:6px">
+        <div><label for="look">Look</label>
+          <select id="look"><option value="night">Night glow</option><option value="bright">Bright classic</option></select></div>
+        <div><label for="sfx">Sound</label>
+          <select id="sfx"><option value="bead">Bead click + chime</option><option value="wood">Wooden tick + chime</option><option value="bell">Soft bell + chime</option><option value="off">No sound</option></select></div>
+      </div>
+      <label>Colours <span style="font-weight:400">(applies to every zikar; Auto = a different colour for each)</span></label>
+      <div class="swatches" id="swatches"></div>
+    </div>
+    <div id="list"></div>
+    <button class="btn ghost wide" id="add">+ Add another zikar</button>
+
+    <details>
+      <summary>Video settings</summary>
+      <label for="brand">Watermark / page name (optional)</label>
+      <input type="text" id="brand" placeholder="e.g. your page name">
+      <div class="row">
+        <div>
+          <label for="beat">Seconds per bead</label>
+          <input type="number" id="beat" min="0.4" max="3" step="0.05" value="1">
+        </div>
+        <div>
+          <label for="res">Video size</label>
+          <select id="res">
+            <option value="1080">1080 × 1920 (HD)</option>
+            <option value="720">720 × 1280</option>
+          </select>
+        </div>
+      </div>
+      <label for="font">Arabic font</label>
+      <select id="font">
+        <option value="Amiri">Amiri (classic Naskh)</option>
+        <option value="Noto Naskh Arabic">Noto Naskh Arabic</option>
+        <option value="Scheherazade New">Scheherazade New</option>
+      </select>
+      <label class="chk"><input type="checkbox" id="showof" checked> Show “of N” under the counter</label>
+    </details>
+  </section>
+
+  <aside class="stage">
+    <div class="cwrap"><canvas id="cv" width="1080" height="1920"></canvas></div>
+    <div class="scrub">
+      <input type="range" id="scrub" min="0" max="10" step="0.01" value="1">
+      <div class="meta"><span id="tcur">0.0s</span><span id="ttot">Total 0s</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="preview">▶ Preview</button>
+      <button class="btn" id="record">● Make video</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="result" id="result">
+      <video id="rv" controls playsinline></video>
+      <a class="btn" id="dl" download="dhikr.mp4">Download video</a>
+    </div>
+    <p class="note">“Make video” records in real time, so keep this tab open and in front until it finishes. Chrome or Edge gives an MP4; other browsers may give WebM.</p>
+  </aside>
+</div>
+
+<script>
+/* ---------- Themes (one per zikar, cycling) ---------- */
+const THEMES = [
+  {name:'Pearl',   bg:['#f7f2e8','#efe5d1'], ink:'#2b2a28', sub:'#4a4843', gold:'#b98a45', ring:'#a98a5f', pat:'rgba(255,255,255,.7)',
+   bead:['#ffffff','#e9e4da','#9f998d'], dotOff:'#c9c4b8'},
+  {name:'Emerald', bg:['#e4ede8','#d6e4dc'], ink:'#1f2a26', sub:'#33433c', gold:'#b98a45', ring:'#a98a5f', pat:'rgba(255,255,255,.65)',
+   bead:['#52b595','#237a60','#0d3b2e'], dotOff:'#bcc8c1'},
+  {name:'Amber',   bg:['#f8ecd8','#f0dcbc'], ink:'#3a2a18', sub:'#5a4630', gold:'#b0792d', ring:'#a98a5f', pat:'rgba(255,255,255,.6)',
+   bead:['#f0c57a','#bb7b2b','#6a3f10'], dotOff:'#d6c5a8'},
+  {name:'Sapphire',bg:['#e4eaf3','#d4deec'], ink:'#1c2536', sub:'#34435e', gold:'#b98a45', ring:'#9a8a6f', pat:'rgba(255,255,255,.65)',
+   bead:['#7fa2dd','#2f5596','#12294f'], dotOff:'#bcc6d6'},
+  {name:'Rose',    bg:['#f6e6e4','#eed3d0'], ink:'#3a1f24', sub:'#5c3a40', gold:'#b98a45', ring:'#a98a6f', pat:'rgba(255,255,255,.6)',
+   bead:['#e6908f','#a63f4f','#561322'], dotOff:'#d9c0c0'},
+  {name:'Violet',  bg:['#ebe5f2','#ddd3ea'], ink:'#2a2038', sub:'#483a60', gold:'#b98a45', ring:'#a08a72', pat:'rgba(255,255,255,.65)',
+   bead:['#b497e0','#6b46a6','#2f1a55'], dotOff:'#c9c0d6'},
+  {name:'Gold',    bg:['#f8efd6','#efdcab'], ink:'#3a2c10', sub:'#5c4a22', gold:'#b0802a', ring:'#a98a5f', pat:'rgba(255,255,255,.6)',
+   bead:['#ffeaa6','#d4a437','#7a5410'], dotOff:'#d9cba5'},
+  {name:'Ocean',   bg:['#dff0f1','#c8e2e5'], ink:'#12333a', sub:'#2c5058', gold:'#b98a45', ring:'#8f9a8a', pat:'rgba(255,255,255,.65)',
+   bead:['#86dbd9','#2a9aa3','#0e4f57'], dotOff:'#b7cfd2'},
+  {name:'Sunset',  bg:['#fbe7dc','#f5cfbd'], ink:'#40201a', sub:'#66392f', gold:'#b0792d', ring:'#a98a6f', pat:'rgba(255,255,255,.6)',
+   bead:['#ffb994','#e0613a','#7d2410'], dotOff:'#e3c6b8'},
+  {name:'Forest',  bg:['#e6eddc','#d2dfc2'], ink:'#1f3016', sub:'#3c5130', gold:'#b0802a', ring:'#9a9a6f', pat:'rgba(255,255,255,.6)',
+   bead:['#b0dc7c','#5f9a2e','#2b4f10'], dotOff:'#c5d0b5'}
+];
+
+const NIGHT = [
+  ['#1d1b33','#0a0916','#f4e6c0',['#ffffff','#efe9dc','#a8a193']],
+  ['#0f3b31','#031410','#35e0a5',['#6fe0b8','#27a37c','#0d4a38']],
+  ['#3b2410','#110803','#ffb347',['#ffd48a','#d98d2b','#7a4510']],
+  ['#10295c','#040a1d','#6aa6ff',['#9dc0ff','#3f73d0','#14305f']],
+  ['#4b1427','#14040e','#ff7d9d',['#ffa9b4','#cf4a63','#6a1429']],
+  ['#2e175c','#0b051f','#b98cff',['#d2b8ff','#8a58d6','#3a1a70']],
+  ['#2a2008','#070400','#ffd15a',['#fff0b3','#e0ae3a','#80580f']],
+  ['#07323d','#010d12','#4fe3e6',['#9cf0ee','#2fb0b8','#0e5560']],
+  ['#4d1c14','#150403','#ff8a5a',['#ffc0a0','#e8693f','#80260f']],
+  ['#17330f','#040c02','#9be35a',['#c4ef8c','#6fb035','#2d5512']]
+].map((t,i)=>({name:THEMES[i].name, dark:true, bg:[t[0],t[1]], glow:t[2], bead:t[3], ink:'#fbf3df', sub:'#d8ceb4', gold:'#f2d184', ring:'#d9bb72', pat:'rgba(242,209,132,.07)', dotOff:'rgba(255,255,255,.22)'}));
+function themeSet(){ return state.look==='bright' ? THEMES : NIGHT; }
+
+/* ---------- State ---------- */
+const SAMPLE = [
+  {ar:'سُبْحَانَ ٱللَّٰهِ', tr:'SubhanAllah',    en:'Glory be to Allah',       count:15, theme:'auto'},
+  {ar:'ٱلْحَمْدُ لِلَّٰهِ', tr:'Alhamdulillah',  en:'All praise is for Allah', count:15, theme:'auto'},
+  {ar:'ٱللَّٰهُ أَكْبَرُ',  tr:'Allahu Akbar',   en:'Allah is the Greatest',   count:15, theme:'auto'}
+];
+let state = {zikars: JSON.parse(JSON.stringify(SAMPLE)), brand:'', beat:1.0, res:'1080', font:'Amiri', sound:true, showof:true, look:'night', scene:'tasbih'};
+try{ const s = localStorage.getItem('dhikrVideoMaker.v2'); if(s){ const p = JSON.parse(s); if(p && Array.isArray(p.zikars) && p.zikars.length) state = Object.assign(state,p); } }catch(e){}
+if(!state.sfx) state.sfx = state.sound===false ? 'off' : 'bead';
+state.sound = state.sfx!=='off';
+function save(){ try{ localStorage.setItem('dhikrVideoMaker.v2', JSON.stringify(state)); }catch(e){} }
+
+/* ---------- Timeline ---------- */
+const INTRO = 1.2, OUTRO = 1.6, XFADE = 0.5, ANIM = 0.45, CHIME_DELAY = 0.16, SYNC = 0.04;
+function anim(){ return Math.min(ANIM, state.beat*0.7); }
+const SCENE_IDS=['tasbih','mosque','mandala','orb','minimal'];
+const SCENES={
+  tasbih :{name:'Tasbih Ring', cy:570, r:150},
+  mosque :{name:'Night Mosque',cy:548, r:140},
+  mandala:{name:'Golden Bloom',cy:566, r:150},
+  orb    :{name:'Glow Orb',    cy:566, r:140},
+  minimal:{name:'Minimal',     cy:562, r:120}
+};
+function themeIndexFor(i,z){ return (z.theme==='auto' || z.theme==null) ? i%THEMES.length : (+z.theme)%THEMES.length; }
+function sceneFor(i,z){
+  if(z.scene && z.scene!=='auto' && SCENES[z.scene]) return z.scene;
+  if(state.scene==='mix') return SCENE_IDS[i%SCENE_IDS.length];
+  return SCENES[state.scene] ? state.scene : 'tasbih';
+}
+function buildTimeline(){
+  let T = 0; const scenes = [];
+  state.zikars.forEach((z,i)=>{
+    const N = Math.max(1, Math.min(999, Math.round(+z.count)||10));
+    const dur = INTRO + (N-1)*state.beat + CHIME_DELAY + OUTRO;
+    scenes.push({i, z, N, start:T, dur, themeIdx: themeIndexFor(i,z), sceneId: sceneFor(i,z)});
+    T += dur - XFADE;
+  });
+  const total = scenes.length ? scenes[scenes.length-1].start + scenes[scenes.length-1].dur : 1;
+  return {scenes, total};
+}
+
+/* ---------- Drawing ---------- */
+const cv = document.getElementById('cv'), g = cv.getContext('2d');
+const VW = 576, VH = 1024, CX = 288, CY = 570, R = 150, BR = 19.5;
+let SC = 1;
+const clamp = (v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const ease = t => { t = clamp(t); return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; };
+const easeOut = t => 1-Math.pow(1-clamp(t),3);
+
+function beadsFor(N){ return N<=20 ? Math.max(2,N) : 10; }
+function spacing(B){ return 148.5/(B-1); }
+function slotAngle(s,B){ const m=2*B, i=((s%m)+m)%m, sp=spacing(B); return i<B ? 18+i*sp : 193.5+(i-B)*sp; }
+function beadAngle(s,B){ const b=Math.floor(s), f=s-b, a0=slotAngle(b,B); let d=slotAngle(b+1,B)-a0; if(d<0)d+=360; return a0+d*f; }
+
+function arFontStr(sz){ return `${sz}px "${state.font}", "Amiri", "Noto Naskh Arabic", "Traditional Arabic", "Segoe UI", serif`; }
+
+function wrap(c, text, maxW){
+  const words = String(text||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
+  if(!words.length) return [];
+  const lines=[]; let cur=words[0];
+  for(let i=1;i<words.length;i++){
+    const t = cur+' '+words[i];
+    if(c.measureText(t).width <= maxW) cur=t; else { lines.push(cur); cur=words[i]; }
+  }
+  lines.push(cur); return lines;
+}
+
+function layoutText(c, z){
+  // Returns blocks with lines and sizes so everything fits between the dots and the ring.
+  const maxW = 470, top = 205, bot = 402;
+  let arS = 56, trS = 17.5, enS = 15.5, res;
+  for(let iter=0; iter<40; iter++){
+    c.direction='rtl'; c.font = arFontStr(arS);
+    const arL = wrap(c, z.ar, maxW);
+    c.direction='ltr'; c.font = `400 ${trS}px Inter, system-ui, sans-serif`;
+    const trL = wrap(c, z.tr, maxW);
+    c.font = `italic 300 ${enS}px Inter, system-ui, sans-serif`;
+    const enL = wrap(c, z.en, maxW);
+    const arLH = arS*1.45, trLH = trS*1.3, enLH = enS*1.35;
+    const h = arL.length*arLH + (trL.length? 6 + trL.length*trLH : 0) + (enL.length? 4 + enL.length*enLH : 0);
+    res = {arL, trL, enL, arS, trS, enS, arLH, trLH, enLH, h};
+    if(h <= bot-top) break;
+    arS = Math.max(24, arS-3); trS = Math.max(12, trS-.5); enS = Math.max(11, enS-.5);
+  }
+  res.y0 = (top+bot)/2 - res.h/2 + 4;
+  return res;
+}
+
+function rgba(hex,a){ const n=parseInt(hex.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+function hsh(i,k){ const x=Math.sin(i*127.1+k*311.7)*43758.5453; return x-Math.floor(x); }
+function star4(c,x,y,r){ c.beginPath(); c.moveTo(x,y-r); c.lineTo(x+r*.28,y-r*.28); c.lineTo(x+r,y); c.lineTo(x+r*.28,y+r*.28); c.lineTo(x,y+r); c.lineTo(x-r*.28,y+r*.28); c.lineTo(x-r,y); c.lineTo(x-r*.28,y-r*.28); c.closePath(); c.fill(); }
+
+function drawBead(c, x, y, r, cols, glow){
+  c.save();
+  if(glow){ c.shadowColor=rgba(glow,.65); c.shadowBlur=16*SC; c.shadowOffsetY=0; c.shadowOffsetX=0; }
+  else { c.shadowColor='rgba(0,0,0,.30)'; c.shadowBlur=9*SC; c.shadowOffsetY=4.5*SC; c.shadowOffsetX=1*SC; }
+  const gr = c.createRadialGradient(x-r*.35,y-r*.4,r*.08,x,y,r*1.02);
+  gr.addColorStop(0,cols[0]); gr.addColorStop(.55,cols[1]); gr.addColorStop(1,cols[2]);
+  c.fillStyle=gr; c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill();
+  c.restore();
+  c.save();
+  c.fillStyle='rgba(255,255,255,.6)'; c.beginPath();
+  c.ellipse(x-r*.34,y-r*.44,r*.3,r*.16,-.6,0,Math.PI*2); c.fill();
+  c.restore();
+}
+
+function drawPattern(c, th){
+  c.save(); c.strokeStyle = th.pat; c.lineWidth = 1.1; c.globalAlpha *= .8;
+  const S = 74, step = 150;
+  for(let gy=-20; gy<VH+step; gy+=step){
+    for(let gx=-20; gx<VW+step; gx+=step){
+      const ox = ((Math.round(gy/step))%2)*step/2;
+      const x = gx+ox, y = gy;
+      c.save(); c.translate(x,y);
+      c.strokeRect(-S/2,-S/2,S,S);
+      c.rotate(Math.PI/4); c.strokeRect(-S/2,-S/2,S,S);
+      c.restore();
+    }
+  }
+  c.restore();
+}
+
+function drawTassel(c, th){
+  const x = CX, y0 = CY+R;
+  c.save();
+  c.strokeStyle = th.gold; c.lineWidth = 1.4;
+  c.beginPath(); c.moveTo(x,y0-2); c.lineTo(x,y0+10); c.stroke();
+  // fringe
+  const grad = c.createLinearGradient(0,y0+28,0,y0+82);
+  grad.addColorStop(0,'#c99a4e'); grad.addColorStop(1,'#a67a33');
+  c.strokeStyle = grad; c.lineWidth = 1.5;
+  for(let i=-5;i<=5;i++){
+    c.beginPath(); c.moveTo(x+i*1.3, y0+30); c.lineTo(x+i*2.4, y0+82); c.stroke();
+  }
+  // cap
+  const cg = c.createRadialGradient(x-3,y0+14,1,x,y0+20,12);
+  cg.addColorStop(0,'#f0cd86'); cg.addColorStop(.6,'#c4903f'); cg.addColorStop(1,'#8a5f20');
+  c.fillStyle = cg; c.beginPath(); c.ellipse(x,y0+21,7.5,11,0,0,Math.PI*2); c.fill();
+  c.fillStyle='#b98a3e'; c.fillRect(x-5,y0+29,10,5);
+  c.restore();
+}
+
+/* ---------- shared drawing helpers ---------- */
+function starPath(c,x,y,r,pts,inner,rot){
+  c.beginPath();
+  for(let i=0;i<pts*2;i++){ const rr = i%2? r*inner : r, a = rot + i*Math.PI/pts; const px=x+Math.sin(a)*rr, py=y-Math.cos(a)*rr; i? c.lineTo(px,py):c.moveTo(px,py); }
+  c.closePath();
+}
+function rrect(c,x,y,w,h,r){ c.beginPath(); if(c.roundRect) c.roundRect(x,y,w,h,r); else c.rect(x,y,w,h); }
+
+function bgBase(K){
+  const {c,th,dark,glow,pulse,cy} = K;
+  const bg = c.createLinearGradient(0,0,0,VH); bg.addColorStop(0,th.bg[0]); bg.addColorStop(1,th.bg[1]);
+  c.fillStyle = bg; c.fillRect(0,0,VW,VH);
+  drawPattern(c, th);
+  const vg = c.createRadialGradient(CX,cy,60,CX,cy,520);
+  if(dark){ vg.addColorStop(0,rgba(glow,.26+.20*pulse)); vg.addColorStop(.55,rgba(glow,.07)); vg.addColorStop(1,rgba(glow,0)); }
+  else { vg.addColorStop(0,'rgba(255,255,255,.34)'); vg.addColorStop(1,'rgba(255,255,255,0)'); }
+  c.fillStyle = vg; c.fillRect(0,0,VW,VH);
+  if(dark){ const ed = c.createRadialGradient(CX,VH/2,260,CX,VH/2,720); ed.addColorStop(0,'rgba(0,0,0,0)'); ed.addColorStop(1,'rgba(0,0,0,.5)'); c.fillStyle=ed; c.fillRect(0,0,VW,VH); }
+}
+function sparkles(K,n){
+  const {c,th,dark,lt} = K;
+  for(let i=0;i<n;i++){
+    const sp = 12+hsh(i,1)*26, x0 = hsh(i,2)*VW, ph = hsh(i,3)*VH;
+    const y = (((ph - lt*sp)%VH)+VH)%VH, x = x0 + Math.sin(lt*.6+i)*10;
+    const r = .8+hsh(i,4)*2.2, tw = .45+.55*Math.sin(lt*2+i*3);
+    c.fillStyle = rgba(th.gold, (dark?.7:.5)*Math.max(0,tw)); c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill();
+  }
+}
+function rays(K,dir){
+  const {c,th,dark,glow,lt,cy} = K;
+  c.save(); c.translate(CX,cy); c.rotate(lt*.06*dir); c.fillStyle = rgba(dark?glow:th.gold, dark?.07:.1);
+  for(let k=0;k<16;k++){ c.beginPath(); c.moveTo(0,0); c.arc(0,0,900,k*Math.PI/8,k*Math.PI/8+Math.PI/16); c.closePath(); c.fill(); }
+  c.restore();
+}
+function domePath(c,x,yb,w,h){
+  c.moveTo(x-w/2,yb); c.bezierCurveTo(x-w/2,yb-h*.9,x-w*.14,yb-h*.92,x,yb-h);
+  c.bezierCurveTo(x+w*.14,yb-h*.92,x+w/2,yb-h*.9,x+w/2,yb); c.closePath();
+}
+function minaretPath(c,x,yb,h,w){
+  c.rect(x-w/2,yb-h,w,h); c.rect(x-w,yb-h*.74,w*2,6); c.rect(x-w*.4,yb-h*1.1,w*.8,h*.36);
+  c.moveTo(x-w*.65,yb-h*1.1); c.quadraticCurveTo(x-w*.4,yb-h*1.2,x,yb-h*1.36); c.quadraticCurveTo(x+w*.4,yb-h*1.2,x+w*.65,yb-h*1.1); c.closePath();
+}
+function skyline(K){
+  const {c,th,dark,glow,lt} = K, b = 962;
+  const hz = c.createRadialGradient(CX,b,10,CX,b,380); hz.addColorStop(0,rgba(glow,dark?.28:.22)); hz.addColorStop(1,rgba(glow,0));
+  c.fillStyle = hz; c.fillRect(0,b-380,VW,420);
+  const fill = dark ? 'rgba(2,4,8,.78)' : rgba(th.ink,.26);
+  c.fillStyle = fill; c.beginPath();
+  c.rect(0,b,VW,VH-b);
+  c.rect(CX-62,b-34,124,34); domePath(c,CX,b-34,150,92);
+  c.rect(196-36,b-22,72,22); domePath(c,196,b-22,84,48);
+  c.rect(380-36,b-22,72,22); domePath(c,380,b-22,84,48);
+  minaretPath(c,60,b,250,15); minaretPath(c,516,b,250,15);
+  minaretPath(c,118,b,168,11); minaretPath(c,458,b,168,11);
+  c.fill();
+  c.strokeStyle = fill; c.lineWidth = 2.2; c.beginPath(); c.moveTo(CX,b-126); c.lineTo(CX,b-150); c.stroke();
+  c.fillStyle = rgba(dark?th.gold:th.ink, dark?.9:.4); c.beginPath(); c.arc(CX,b-156,5,0,Math.PI*2); c.fill();
+  c.fillStyle = fill; c.beginPath(); c.arc(CX+2.5,b-157,4.2,0,Math.PI*2); c.fill();
+  const wins = [[CX-45,b-24],[CX-22,b-24],[CX,b-24],[CX+22,b-24],[CX+45,b-24],[176,b-12],[196,b-12],[216,b-12],[360,b-12],[380,b-12],[400,b-12],
+    [60,b-132],[60,b-182],[516,b-132],[516,b-182],[118,b-96],[458,b-96],[60,b-82],[516,b-82]];
+  wins.forEach((w,i)=>{
+    const tw = .55+.45*Math.sin(lt*1.3+i*2.1);
+    c.fillStyle = rgba(dark?th.gold:'#ffffff', (dark?.95:.7)*tw);
+    rrect(c,w[0]-1.8,w[1]-4,3.6,8,1.6); c.fill();
+  });
+}
+function moon(K){
+  const {c,th,dark} = K, mx=470,my=112;
+  c.save(); c.shadowColor = rgba(th.gold,.9); c.shadowBlur = 24*SC;
+  c.beginPath(); c.rect(0,0,VW,VH); c.arc(mx+11,my-6,19,0,Math.PI*2); c.clip('evenodd');
+  c.fillStyle = dark ? '#fff4d0' : th.gold; c.beginPath(); c.arc(mx,my,24,0,Math.PI*2); c.fill();
+  c.restore();
+}
+
+const BACK = {
+  tasbih(K){
+    const {c,th,dark,lt,cy} = K;
+    c.save(); c.translate(CX,cy); c.rotate(lt*0.16);
+    c.strokeStyle = rgba(th.gold, dark?.2:.26); c.lineWidth = 1.1;
+    for(let k=0;k<3;k++){ c.save(); c.rotate(k*Math.PI/6); const h=137; c.strokeRect(-h,-h,h*2,h*2); c.restore(); }
+    c.beginPath(); c.arc(0,0,196,0,Math.PI*2); c.stroke();
+    c.setLineDash([2,7]); c.beginPath(); c.arc(0,0,210,0,Math.PI*2); c.stroke();
+    c.restore();
+    sparkles(K,32);
+  },
+  mosque(K){
+    const {c,th,dark,lt} = K;
+    for(let i=0;i<90;i++){
+      const x = hsh(i,11)*VW, y = hsh(i,12)*760, r = .5+hsh(i,13)*1.5, tw = .35+.65*Math.max(0,Math.sin(lt*(1+hsh(i,14)*2)+i*5));
+      c.fillStyle = rgba(dark?'#fff4d0':th.gold, (dark?.9:.5)*tw); c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill();
+    }
+    for(let i=0;i<6;i++){
+      const x = hsh(i,21)*VW, y = 220+hsh(i,22)*400, tw = Math.max(0,Math.sin(lt*1.4+i*2.3));
+      c.fillStyle = rgba(th.gold,(dark?.9:.6)*tw); star4(c,x,y,3+hsh(i,23)*4);
+    }
+    // shooting star
+    const per = 6, ph = (lt+1.5)%per; if(ph<.9){ const u=ph/.9, x=380-u*260, y=250+u*110; const gr=c.createLinearGradient(x,y,x+60,y-26); gr.addColorStop(0,rgba('#ffffff',(1-u)*.9)); gr.addColorStop(1,'rgba(255,255,255,0)'); c.strokeStyle=gr; c.lineWidth=1.6; c.beginPath(); c.moveTo(x,y); c.lineTo(x+60,y-26); c.stroke(); }
+    moon(K); skyline(K);
+  },
+  mandala(K){ rays(K,1); sparkles(K,28); },
+  orb(K){ rays(K,-1); sparkles(K,30); },
+  minimal(K){
+    const {c,th,dark,glow,lt} = K;
+    [[0,.7,.5,300],[1,.3,.28,260],[2,.55,.8,320]].forEach(([i,bx,by,r])=>{
+      const x = VW*bx + Math.sin(lt*.25+i*2)*70, y = VH*by + Math.cos(lt*.2+i*3)*80;
+      const g = c.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,rgba(dark?glow:th.bead[1],dark?.16:.16)); g.addColorStop(1,rgba(dark?glow:th.bead[1],0));
+      c.fillStyle = g; c.fillRect(0,0,VW,VH);
+    });
+    sparkles(K,16);
+  }
+};
+
+function frameOrn(K){
+  const {c,th,dark,alpha} = K;
+  c.save(); c.strokeStyle = rgba(th.gold, dark?.5:.55); c.lineWidth = 1.3;
+  const fr = (m,al)=>{ c.globalAlpha = alpha*al; rrect(c,m,m,VW-2*m,VH-2*m,26); c.stroke(); };
+  fr(14,1); fr(22,.4);
+  c.globalAlpha = alpha; c.fillStyle = rgba(th.gold,.9);
+  [[14,14],[VW-14,14],[14,VH-14],[VW-14,VH-14]].forEach(([x,y])=>star4(c,x,y,7));
+  star4(c,CX,14,6); star4(c,CX,VH-14,6);
+  c.restore();
+}
+
+function header(K){
+  const {c,th,dark,glow,done,lt,alpha,sc} = K;
+  const nZ = state.zikars.length, gap = nZ>10 ? 18 : 24;
+  for(let i=0;i<nZ;i++){
+    const x = CX + (i-(nZ-1)/2)*gap;
+    let col = th.dotOff, rad = 3.6;
+    if(i<sc.i) col = th.gold; else if(i===sc.i){ col = done ? th.gold : (dark? glow : th.ink); rad = 4.8; }
+    c.save(); if(dark && i<=sc.i){ c.shadowColor = rgba(glow,.9); c.shadowBlur = 10*SC; }
+    c.fillStyle = col; c.beginPath(); c.arc(x,186,rad,0,Math.PI*2); c.fill(); c.restore();
+  }
+  const L = layoutText(c, sc.z), lt2 = sc.i===0 ? lt+.5 : lt;
+  const e1 = easeOut((lt2-.05)/.6), e2 = easeOut((lt2-.22)/.6), e3 = easeOut((lt2-.38)/.6);
+  c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+  let y = L.y0;
+  c.save(); c.globalAlpha = alpha*e1; c.translate(0,(1-e1)*18);
+  if(dark){ c.shadowColor = rgba(th.gold,.55); c.shadowBlur = 18*SC; }
+  c.direction = 'rtl'; c.font = arFontStr(L.arS); c.fillStyle = th.ink;
+  L.arL.forEach(t=>{ y += L.arLH; c.fillText(t, CX, y - L.arLH*.28); });
+  c.restore();
+  c.direction = 'ltr';
+  if(L.trL.length){ y += 6; c.save(); c.globalAlpha = alpha*e2; c.translate(0,(1-e2)*14);
+    c.font = `500 ${L.trS}px Inter, system-ui, sans-serif`; c.fillStyle = dark ? th.gold : th.ink;
+    L.trL.forEach(t=>{ y += L.trLH; c.fillText(t, CX, y - L.trLH*.25); }); c.restore(); }
+  if(L.enL.length){ y += 4; c.save(); c.globalAlpha = alpha*e3*.9; c.translate(0,(1-e3)*12);
+    c.font = `italic 300 ${L.enS}px Inter, system-ui, sans-serif`; c.fillStyle = th.sub;
+    L.enL.forEach(t=>{ y += L.enLH; c.fillText(t, CX, y - L.enLH*.25); }); c.restore(); }
+}
+
+function numberDraw(K, ny, size3, size2, o){
+  o = o||{};
+  const {c,th,dark,glow,done,pulse,sinceFlip} = K, nStr = String(K.shown), size = nStr.length>=3 ? size3 : size2;
+  const pop = 1 + .24*Math.pow(Math.max(0,1-sinceFlip/.3),2);
+  c.save(); c.textAlign='center'; c.textBaseline='middle'; c.direction='ltr';
+  c.translate(CX,ny); c.scale(pop,pop);
+  c.font = `${o.weight||300} ${size}px Inter, system-ui, sans-serif`;
+  if(o.outline){ c.lineJoin='round'; c.lineWidth=8; c.strokeStyle='rgba(0,0,0,.35)'; c.strokeText(nStr,0,0); }
+  c.fillStyle = o.color || (done ? th.gold : th.ink);
+  if(dark || o.outline){ c.shadowColor = o.outline ? 'rgba(0,0,0,.4)' : rgba(done?th.gold:glow,.8); c.shadowBlur = (16+14*pulse)*SC; }
+  c.fillText(nStr,0,0); c.restore();
+}
+function ofN(K,y,size){
+  if(!state.showof) return;
+  const {c,th} = K;
+  c.save(); c.textAlign='center'; c.textBaseline='middle'; c.direction='ltr';
+  c.fillStyle = K.ofColor || th.sub; c.font = `300 ${size||15.5}px Inter, system-ui, sans-serif`; c.fillText('of '+K.N, CX, y); c.restore();
+}
+
+const COUNT = {
+  tasbih(K){
+    const {c,th,dark,glow,N,kF,cy} = K;
+    c.strokeStyle = dark ? rgba(th.gold,.6) : th.ring; c.lineWidth = 1.4; c.beginPath(); c.arc(CX,cy,R,0,Math.PI*2); c.stroke();
+    const PR = R+34, frac = clamp(kF/N);
+    c.save(); c.strokeStyle = rgba(th.gold,.16); c.lineWidth = 3; c.beginPath(); c.arc(CX,cy,PR,0,Math.PI*2); c.stroke();
+    if(frac>0){
+      c.lineCap = 'round'; c.strokeStyle = dark ? glow : th.gold; c.lineWidth = 3.6;
+      c.shadowColor = rgba(dark?glow:th.gold, dark?.95:.5); c.shadowBlur = (dark?18:10)*SC;
+      c.beginPath(); c.arc(CX,cy,PR,-Math.PI/2,-Math.PI/2+frac*Math.PI*2); c.stroke();
+    }
+    c.restore();
+    drawTassel(c, th);
+    const B = beadsFor(N), br = Math.min(BR, 0.46*spacing(B)*Math.PI/180*R);
+    for(let i=0;i<B;i++){
+      const a = beadAngle(i + kF, B) * Math.PI/180;
+      drawBead(c, CX + R*Math.sin(a), cy - R*Math.cos(a), br, th.bead, dark?glow:null);
+    }
+    numberDraw(K,cy-12,62,96); ofN(K,cy+54);
+  },
+  mosque(K){
+    const {c,th,dark,glow,N,kF,cy,lt,done,tDone} = K, RR = 140;
+    const P = N<=24 ? Math.max(2,N) : 24, litF = kF*P/N;
+    c.strokeStyle = rgba(th.gold,.28); c.lineWidth = 1.2; c.beginPath(); c.arc(CX,cy,RR,0,Math.PI*2); c.stroke();
+    c.strokeStyle = rgba(th.gold,.12); c.beginPath(); c.arc(CX,cy,RR-34,0,Math.PI*2); c.stroke();
+    const r0 = Math.min(13.5, 0.4*2*Math.PI*RR/P);
+    for(let i=0;i<P;i++){
+      const a = i*Math.PI*2/P, x = CX+Math.sin(a)*RR, y = cy-Math.cos(a)*RR, u = clamp(litF-i);
+      if(u<=0){ c.save(); c.strokeStyle = rgba(th.gold,.38); c.lineWidth = 1.1; starPath(c,x,y,r0*.8,8,.55,a); c.stroke(); c.restore(); continue; }
+      const sz = r0*(u<1 ? (.55+.45*u)+.9*Math.sin(u*Math.PI) : 1);
+      c.save(); c.shadowColor = rgba(dark?glow:th.gold,.95); c.shadowBlur = (dark?16:8)*SC;
+      c.fillStyle = done ? (dark?'#fff4d0':th.gold) : (dark? th.gold : th.bead[1]); starPath(c,x,y,sz,8,.55,a); c.fill(); c.restore();
+    }
+    numberDraw(K,cy-12,62,96); ofN(K,cy+54);
+  },
+  mandala(K){
+    const {c,th,dark,glow,N,kF,cy,lt,done,tDone} = K;
+    const P = N<=24 ? Math.max(3,N) : 24, litF = kF*P/N, rot = lt*.1;
+    const r0 = 66, L1 = 84;
+    // outer bloom on completion
+    const bl = easeOut((lt - tDone)/.9);
+    if(bl>0){
+      for(let i=0;i<P;i++){
+        const a = rot*-1.4 + (i+.5)*Math.PI*2/P; c.save(); c.translate(CX,cy); c.rotate(a);
+        const L = 56*bl, w = Math.min(26, .42*2*Math.PI*(r0+L1+10)/P);
+        const g = c.createLinearGradient(0,-(r0+L1-8),0,-(r0+L1+L)); g.addColorStop(0,rgba(th.gold,.95)); g.addColorStop(1,rgba(th.gold,.25));
+        c.fillStyle = g; if(dark){ c.shadowColor = rgba(th.gold,.8); c.shadowBlur = 12*SC; }
+        c.beginPath(); c.moveTo(0,-(r0+L1-8)); c.bezierCurveTo(w,-(r0+L1+L*.3),w*.6,-(r0+L1+L*.85),0,-(r0+L1+L));
+        c.bezierCurveTo(-w*.6,-(r0+L1+L*.85),-w,-(r0+L1+L*.3),0,-(r0+L1-8)); c.fill(); c.restore();
+      }
+    }
+    c.strokeStyle = rgba(th.gold,.3); c.lineWidth = 1; c.beginPath(); c.arc(CX,cy,r0-2,0,Math.PI*2); c.stroke();
+    for(let i=0;i<P;i++){
+      const u = clamp(litF-i);
+      const a = rot + i*Math.PI*2/P, w = Math.min(36, .52*2*Math.PI*(r0+L1*.45)/P);
+      c.save(); c.translate(CX,cy); c.rotate(a);
+      if(u<=0){ c.strokeStyle = rgba(th.gold,.3); c.lineWidth = 1; c.beginPath(); c.moveTo(0,-r0); c.lineTo(0,-r0-10); c.stroke(); c.restore(); continue; }
+      const e = easeOut(u), L = L1*e, ww = w*(.4+.6*e);
+      const g = c.createLinearGradient(0,-r0,0,-r0-L); g.addColorStop(0,th.bead[2]); g.addColorStop(.5,th.bead[1]); g.addColorStop(1,th.bead[0]);
+      c.fillStyle = g; if(dark){ c.shadowColor = rgba(glow,.8); c.shadowBlur = 12*SC; }
+      c.beginPath(); c.moveTo(0,-r0); c.bezierCurveTo(ww,-r0-L*.3,ww*.7,-r0-L*.8,0,-r0-L);
+      c.bezierCurveTo(-ww*.7,-r0-L*.8,-ww,-r0-L*.3,0,-r0); c.fill();
+      c.shadowColor='transparent'; c.strokeStyle = 'rgba(255,255,255,.45)'; c.lineWidth = 1; c.beginPath(); c.moveTo(0,-r0-4); c.lineTo(0,-r0-L*.78); c.stroke();
+      c.restore();
+    }
+    // centre disc
+    c.save(); c.fillStyle = dark ? 'rgba(0,0,0,.45)' : 'rgba(255,255,255,.7)'; c.strokeStyle = th.gold; c.lineWidth = 1.6;
+    if(dark){ c.shadowColor = rgba(glow,.6); c.shadowBlur = 16*SC; }
+    c.beginPath(); c.arc(CX,cy,r0-8,0,Math.PI*2); c.fill(); c.stroke(); c.restore();
+    numberDraw(K,cy-6,50,78); ofN(K,cy+38,14);
+  },
+  orb(K){
+    const {c,th,dark,glow,N,kF,cy,lt,pulse,done} = K, OR = 132, frac = clamp(kF/N);
+    // outer progress arc
+    c.save(); c.strokeStyle = rgba(th.gold,.16); c.lineWidth = 3; c.beginPath(); c.arc(CX,cy,OR+22,0,Math.PI*2); c.stroke();
+    if(frac>0){ c.lineCap='round'; c.strokeStyle = dark?glow:th.gold; c.lineWidth = 3.6; c.shadowColor = rgba(dark?glow:th.gold,.9); c.shadowBlur = 16*SC;
+      c.beginPath(); c.arc(CX,cy,OR+22,-Math.PI/2,-Math.PI/2+frac*Math.PI*2); c.stroke(); }
+    c.restore();
+    // glass
+    c.save();
+    c.shadowColor = rgba(dark?glow:th.bead[1],.55); c.shadowBlur = 26*SC; c.shadowOffsetY = dark?0:8*SC;
+    c.fillStyle = rgba(th.bead[2], dark?.4:.5); c.beginPath(); c.arc(CX,cy,OR,0,Math.PI*2); c.fill(); c.restore();
+    c.save(); c.beginPath(); c.arc(CX,cy,OR,0,Math.PI*2); c.clip();
+    const bottom = cy+OR, level = bottom - frac*2*OR, amp = (3+9*pulse)*(frac>=.98?.3:1);
+    const wave = (off,al,lift)=>{
+      c.beginPath(); c.moveTo(CX-OR-4,bottom+4);
+      for(let x=-OR-4;x<=OR+4;x+=4){ c.lineTo(CX+x, level+lift + Math.sin(x*.045+lt*2.4+off)*amp + Math.sin(x*.09-lt*1.7+off)*amp*.5); }
+      c.lineTo(CX+OR+4,bottom+4); c.closePath();
+      const g = c.createLinearGradient(0,level-10,0,bottom); g.addColorStop(0,th.bead[0]); g.addColorStop(.5,th.bead[1]); g.addColorStop(1,th.bead[2]);
+      c.globalAlpha = K.alpha*al; c.fillStyle = g; c.fill(); c.globalAlpha = K.alpha;
+    };
+    if(frac>0.002){
+      wave(2,.5,-6); wave(0,.92,0);
+      for(let i=0;i<12;i++){ const h = Math.max(10,bottom-level), yy = bottom - ((lt*(18+hsh(i,31)*22) + hsh(i,32)*h) % h), xx = CX + (hsh(i,33)-.5)*OR*1.5 + Math.sin(lt*2+i)*5, rb = 1.5+hsh(i,34)*3.5;
+        c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 1; c.beginPath(); c.arc(xx,yy,rb,0,Math.PI*2); c.stroke(); }
+    }
+    c.restore();
+    c.save(); c.strokeStyle = rgba(th.gold,.85); c.lineWidth = 2; if(dark){ c.shadowColor = rgba(th.gold,.8); c.shadowBlur = 10*SC; }
+    c.beginPath(); c.arc(CX,cy,OR,0,Math.PI*2); c.stroke();
+    c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 3.2; c.lineCap='round'; c.shadowColor='transparent';
+    c.beginPath(); c.arc(CX,cy,OR-10,Math.PI*1.12,Math.PI*1.42); c.stroke(); c.restore();
+    K.ofColor = '#ffffff';
+    numberDraw(K,cy-10,74,112,{color:'#ffffff',outline:true,weight:300}); ofN(K,cy+66,17);
+  },
+  minimal(K){
+    const {c,th,dark,glow,N,kF,cy,done} = K;
+    numberDraw(K,cy-20,150,214,{weight:200}); ofN(K,cy+84,21);
+    const y = cy+134, W = 420;
+    if(N<=40){
+      const gap = Math.min(8, W/N*.35), tw = (W-(N-1)*gap)/N, x0 = CX-W/2;
+      for(let i=0;i<N;i++){
+        const u = clamp(kF-i), x = x0+i*(tw+gap);
+        const h = 24*(1+.5*(u<1&&u>0?Math.sin(u*Math.PI):0));
+        c.save();
+        if(u<=0){ c.fillStyle = rgba(th.gold,.22); }
+        else { c.fillStyle = done ? th.gold : (dark?glow:th.gold); if(dark){ c.shadowColor = rgba(glow,.9); c.shadowBlur = 12*SC; } }
+        rrect(c,x,y-h/2,tw,h,Math.min(tw/2,5)); c.fill(); c.restore();
+      }
+    } else {
+      c.fillStyle = rgba(th.gold,.22); rrect(c,CX-W/2,y-4,W,8,4); c.fill();
+      c.save(); c.fillStyle = dark?glow:th.gold; if(dark){ c.shadowColor = rgba(glow,.9); c.shadowBlur = 12*SC; }
+      rrect(c,CX-W/2,y-4,Math.max(8,W*clamp(kF/N)),8,4); c.fill(); c.restore();
+    }
+  }
+};
+
+function completion(K){
+  const {c,th,dark,glow,alpha,lt,tDone,cy,S} = K, rp = lt - tDone, base = S.r;
+  if(rp>0 && rp<.35){ c.save(); c.globalAlpha = alpha*.22*(1-rp/.35); c.fillStyle = dark ? rgba(glow,1) : rgba(th.gold,1); c.fillRect(0,0,VW,VH); c.restore(); }
+  [0,.22,.44].forEach((dl,ix)=>{
+    const p = (rp - dl)/1.4;
+    if(p>0 && p<1){
+      c.save(); c.globalAlpha = alpha*(1-p)*.9; c.strokeStyle = th.gold; c.lineWidth = 2.4-ix*.5;
+      if(dark){ c.shadowColor = rgba(th.gold,.9); c.shadowBlur = 12*SC; }
+      c.beginPath(); c.arc(CX,cy,base+40+easeOut(p)*(70+ix*45),0,Math.PI*2); c.stroke(); c.restore();
+    }
+  });
+  const bp = rp/1.6;
+  if(bp>0 && bp<1){
+    for(let i=0;i<48;i++){
+      const ang = hsh(i,5)*Math.PI*2, dist = (80+hsh(i,6)*210)*easeOut(bp);
+      const px = CX+Math.cos(ang)*dist, py = cy+Math.sin(ang)*dist + 40*bp*bp*hsh(i,7);
+      const r = (3+hsh(i,8)*6)*(1-bp*.7);
+      c.save(); c.globalAlpha = alpha*Math.pow(1-bp,.8);
+      c.fillStyle = i%3===0 ? (dark?'#ffffff':glow) : th.gold;
+      if(dark){ c.shadowColor = rgba(th.gold,.9); c.shadowBlur = 8*SC; }
+      star4(c,px,py,r); c.restore();
+    }
+  }
+}
+function brandDraw(K){
+  const {c,th,dark,alpha,sid} = K, brand = (state.brand||'').trim();
+  if(!brand) return;
+  const by = sid==='mosque' ? 996 : 842;
+  c.save(); c.textAlign='center'; c.direction='ltr'; c.textBaseline='alphabetic'; c.fillStyle = dark ? th.gold : (sid==='mosque'?'#fff':th.ink); c.font = '500 15px Inter, system-ui, sans-serif';
+  try{ c.letterSpacing = '4px'; }catch(e){}
+  c.fillText(brand, CX+2, by);
+  let w = c.measureText(brand).width;
+  try{ c.letterSpacing = '0px'; }catch(e){}
+  c.strokeStyle = sid==='mosque' ? th.gold : th.ring; c.globalAlpha = alpha*.7; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(CX-w/2-4,by+11); c.lineTo(CX+w/2,by+11); c.stroke(); c.restore();
+}
+
+function drawScene(c, sc, lt, alpha){
+  const set = themeSet(), th = set[sc.themeIdx % set.length], dark = !!th.dark, glow = th.glow || th.bead[1];
+  const sid = SCENES[sc.sceneId] ? sc.sceneId : 'tasbih', S = SCENES[sid], cy = S.cy;
+  const N = sc.N, beat = state.beat, A = anim();
+  c.save(); c.globalAlpha = alpha;
+  let kF = 0, shown = 0;
+  for(let j=1;j<=N;j++){
+    const tj = INTRO + (j-1)*beat;
+    kF += easeOut((lt - tj)/A);
+    if(lt >= tj + SYNC) shown = j;
+  }
+  const tDone = INTRO + (N-1)*beat + SYNC, done = lt >= tDone;
+  const sinceFlip = shown>0 ? lt - (INTRO+(shown-1)*beat+SYNC) : 9;
+  const pulse = Math.max(0, 1 - sinceFlip/0.7);
+  const K = {c,th,dark,glow,N,kF,shown,done,sinceFlip,pulse,lt,tDone,alpha,cy,S,sid,A,sc};
+  bgBase(K); BACK[sid](K); frameOrn(K); header(K); COUNT[sid](K); completion(K); brandDraw(K);
+  c.restore();
+}
+
+function renderAt(t, tl){
+  tl = tl || buildTimeline();
+  const W = cv.width;
+  SC = W/VW;
+  g.setTransform(SC,0,0,SC,0,0);
+  g.globalAlpha = 1; g.fillStyle='#000'; g.fillRect(0,0,VW,VH);
+  const active = tl.scenes.filter(s=> t>=s.start && t<s.start+s.dur);
+  if(!active.length){ const s = t<0? tl.scenes[0] : tl.scenes[tl.scenes.length-1]; if(s) drawScene(g,s,t<0?0:s.dur,1); return; }
+  active.forEach((s,idx)=>{
+    const lt = t - s.start;
+    const a = s.i>0 ? clamp(lt/XFADE) : 1;
+    drawScene(g,s,lt,a);
+  });
+}
+
+/* ---------- Audio ---------- */
+let ac = null;
+function noiseBuf(ctx){
+  const b = ctx.createBuffer(1, ctx.sampleRate*0.05, ctx.sampleRate), d = b.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i] = (Math.random()*2-1)*Math.pow(1-i/d.length,3);
+  return b;
+}
+function scheduleAudio(ctx, outNodes, t0, tl){
+  const out = ctx.createGain(); out.gain.value = 0.9; outNodes.forEach(n=>out.connect(n));
+  const nb = noiseBuf(ctx);
+  const click = (at)=>{
+    const fx = state.sfx || 'bead';
+    if(fx==='wood'){
+      const o = ctx.createOscillator(), gn = ctx.createGain(); o.type='triangle';
+      o.frequency.setValueAtTime(950,at); o.frequency.exponentialRampToValueAtTime(380,at+.06);
+      gn.gain.setValueAtTime(.0001,at); gn.gain.exponentialRampToValueAtTime(.55,at+.003); gn.gain.exponentialRampToValueAtTime(.0001,at+.11);
+      o.connect(gn); gn.connect(out); o.start(at); o.stop(at+.15);
+      const ns = ctx.createBufferSource(), ng = ctx.createGain(), bp = ctx.createBiquadFilter();
+      ns.buffer = nb; bp.type='bandpass'; bp.frequency.value = 1300; ng.gain.value = .45; ns.connect(bp); bp.connect(ng); ng.connect(out); ns.start(at);
+      return;
+    }
+    if(fx==='bell'){
+      [[1318.5,.22],[2637,.07],[3951,.03]].forEach(([f,v])=>{
+        const o = ctx.createOscillator(), gn = ctx.createGain(); o.type='sine'; o.frequency.value=f;
+        gn.gain.setValueAtTime(.0001,at); gn.gain.exponentialRampToValueAtTime(v,at+.004); gn.gain.exponentialRampToValueAtTime(.0001,at+.7);
+        o.connect(gn); gn.connect(out); o.start(at); o.stop(at+.8);
+      });
+      return;
+    }
+    const o = ctx.createOscillator(), o2 = ctx.createOscillator(), gn = ctx.createGain();
+    o.type='sine'; o.frequency.value = 1680; o2.type='sine'; o2.frequency.value = 3390;
+    gn.gain.setValueAtTime(0.0001,at); gn.gain.exponentialRampToValueAtTime(.38,at+.002); gn.gain.exponentialRampToValueAtTime(.0001,at+.07);
+    const g2 = ctx.createGain(); g2.gain.value = .35; o2.connect(g2); g2.connect(gn); o.connect(gn); gn.connect(out);
+    o.start(at); o2.start(at); o.stop(at+.1); o2.stop(at+.1);
+    const ns = ctx.createBufferSource(), ng = ctx.createGain(), bp = ctx.createBiquadFilter();
+    ns.buffer = nb; bp.type='bandpass'; bp.frequency.value = 2600; ng.gain.value = .5;
+    ns.connect(bp); bp.connect(ng); ng.connect(out); ns.start(at);
+  };
+  const chime = (at)=>{
+    [[523.25,.30],[784,.20],[1046.5,.07]].forEach(([f,v])=>{
+      const o = ctx.createOscillator(), gn = ctx.createGain(); o.type='sine'; o.frequency.value=f;
+      gn.gain.setValueAtTime(.0001,at); gn.gain.exponentialRampToValueAtTime(v,at+.02); gn.gain.exponentialRampToValueAtTime(.0001,at+1.9);
+      o.connect(gn); gn.connect(out); o.start(at); o.stop(at+2);
+    });
+  };
+  tl.scenes.forEach(s=>{
+    for(let j=1;j<=s.N;j++) click(t0 + s.start + INTRO + (j-1)*state.beat + SYNC);
+    chime(t0 + s.start + INTRO + (s.N-1)*state.beat + CHIME_DELAY);
+  });
+  return out;
+}
+
+/* ---------- Run (preview / record) ---------- */
+const $ = id => document.getElementById(id);
+let running = false, rafId = 0, recorder = null, chunks = [], stopFlag = false;
+
+async function ensureFonts(){
+  try{
+    const sample = state.zikars.map(z=>z.ar).join(' ') || 'بسم';
+    await Promise.race([
+      Promise.all([
+        document.fonts.load(arFontStr(56), sample),
+        document.fonts.load('200 90px Inter','0123456789'),
+        document.fonts.load('400 17px Inter','Aa'),
+        document.fonts.load('italic 300 15px Inter','Aa')
+      ]),
+      new Promise(r=>setTimeout(r,4000))
+    ]);
+  }catch(e){}
+}
+function applyRes(){ const W = +state.res || 1080; cv.width = W; cv.height = Math.round(W*16/9); }
+function pickMime(){
+  const list = ['video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+  if(!window.MediaRecorder) return null;
+  return list.find(m=>{ try{ return MediaRecorder.isTypeSupported(m); }catch(e){ return false; } }) || '';
+}
+function setBusy(b){ running=b; $('preview').textContent = b && !recorder ? '■ Stop' : '▶ Preview'; $('record').disabled = b; $('preview').disabled = b && !!recorder; }
+function stopRun(){ stopFlag = true; }
+
+async function run(record){
+  if(running) return;
+  await ensureFonts();
+  applyRes();
+  const tl = buildTimeline();
+  $('result').style.display='none';
+  stopFlag = false;
+  const wantSound = state.sound || record; // keep audio track in the recording even if muted? use setting
+  ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+  try{ await ac.resume(); }catch(e){}
+  const outs = [];
+  let dest = null;
+  if(record){ dest = ac.createMediaStreamDestination(); outs.push(dest); }
+  if(state.sound){ outs.push(ac.destination); }
+  const start = ac.currentTime + 0.25;
+  let master = null;
+  if(state.sound){ master = scheduleAudio(ac, outs, start, tl); }
+  else if(record){ /* silent audio track so players don't complain */ }
+
+  if(record){
+    const mime = pickMime();
+    if(mime === null){ $('status').textContent = 'This browser cannot record video. Please use Chrome or Edge.'; return; }
+    const stream = cv.captureStream(30);
+    dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+    chunks = [];
+    try{ recorder = new MediaRecorder(stream, mime ? {mimeType:mime, videoBitsPerSecond:(+state.res>=1080?9e6:5e6), audioBitsPerSecond:128000} : {}); }
+    catch(e){ recorder = new MediaRecorder(stream); }
+    recorder.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+    recorder.start(500);
+  }
+  setBusy(true);
+  const finish = async ()=>{
+    cancelAnimationFrame(rafId);
+    if(master){ try{ master.disconnect(); }catch(e){} }
+    if(record && recorder){
+      const r = recorder; const mt = r.mimeType || 'video/webm';
+      await new Promise(res=>{ r.onstop = res; try{ r.stop(); }catch(e){ res(); } });
+      recorder = null;
+      if(!stopFlag){
+        const blob = new Blob(chunks,{type:mt});
+        const url = URL.createObjectURL(blob);
+        const ext = /mp4/.test(mt) ? 'mp4' : 'webm';
+        $('rv').src = url; $('dl').href = url; $('dl').download = 'dhikr-video.'+ext; $('dl').textContent = 'Download video (.'+ext+')';
+        $('result').style.display='block';
+        $('status').innerHTML = '<b>Done.</b> Your video is ready below.';
+      } else $('status').textContent = 'Stopped.';
+    } else {
+      $('status').textContent = '';
+    }
+    setBusy(false);
+    $('scrub').value = 0; updateTime(0); renderAt(0);
+  };
+  const tick = ()=>{
+    const t = ac.currentTime - start;
+    if(stopFlag || t >= tl.total + 0.3){ finish(); return; }
+    renderAt(Math.max(0,Math.min(t,tl.total)), tl);
+    $('scrub').value = Math.max(0,t); updateTime(Math.max(0,t));
+    if(record) $('status').innerHTML = `<b>Recording…</b> ${Math.max(0,t).toFixed(1)} / ${tl.total.toFixed(1)}s. Keep this tab open.`;
+    rafId = requestAnimationFrame(tick);
+  };
+  rafId = requestAnimationFrame(tick);
+}
+
+/* ---------- UI ---------- */
+function updateTime(t){ $('tcur').textContent = t.toFixed(1)+'s'; }
+function refreshStage(){
+  const tl = buildTimeline();
+  $('scrub').max = tl.total.toFixed(2);
+  $('ttot').textContent = 'Total '+tl.total.toFixed(1)+'s';
+  if(!running){ applyRes(); renderAt(+$('scrub').value, tl); updateTime(+$('scrub').value); try{ refreshThumbs(); }catch(e){} }
+}
+let rt = 0; function refreshSoon(){ clearTimeout(rt); rt = setTimeout(refreshStage, 120); }
+
+function themeOptions(sel){
+  return `<option value="auto"${sel==='auto'||sel==null?' selected':''}>Auto</option>` +
+    THEMES.map((t,i)=>`<option value="${i}"${String(sel)===String(i)?' selected':''}>${t.name}</option>`).join('');
+}
+function sceneOptions(sel){
+  return `<option value="auto"${(!sel||sel==='auto')?' selected':''}>Same as the main scene</option>` +
+    SCENE_IDS.map(id=>`<option value="${id}"${sel===id?' selected':''}>${SCENES[id].name}</option>`).join('');
+}
+function renderList(){
+  const host = $('list'); host.innerHTML = '';
+  state.zikars.forEach((z,i)=>{
+    const d = document.createElement('div'); d.className='zcard';
+    d.innerHTML = `
+      <div class="zhead"><span class="num">${i+1}</span><strong>Zikar ${i+1}</strong><span class="sp"></span>
+        <button class="ibtn" data-a="up" title="Move up" ${i===0?'disabled':''}>↑</button>
+        <button class="ibtn" data-a="down" title="Move down" ${i===state.zikars.length-1?'disabled':''}>↓</button>
+        <button class="ibtn" data-a="del" title="Remove" ${state.zikars.length===1?'disabled':''}>✕</button></div>
+      <label>Arabic</label>
+      <textarea class="ar" lang="ar" dir="rtl" data-f="ar" placeholder="اكتب الذكر هنا">${esc(z.ar)}</textarea>
+      <label>Translation</label>
+      <input type="text" data-f="en" value="${esc(z.en)}" placeholder="e.g. Glory be to Allah">
+      <label>Transliteration (optional)</label>
+      <input type="text" data-f="tr" value="${esc(z.tr)}" placeholder="e.g. SubhanAllah">
+      <div class="row" style="margin-top:2px">
+        <div><label>Count</label><input type="number" data-f="count" min="1" max="999" value="${esc(z.count)}"></div>
+        <div><label>Colour theme</label><select data-f="theme">${themeOptions(z.theme)}</select></div>
+      </div>
+      <label>Scene for this zikar</label>
+      <select data-f="scene">${sceneOptions(z.scene)}</select>`;
+    d.querySelectorAll('[data-f]').forEach(el=>{
+      const ev = el.tagName==='SELECT' ? 'change' : 'input';
+      el.addEventListener(ev,()=>{ z[el.dataset.f] = el.value; save(); refreshSoon(); if(el.dataset.f==='theme') buildSwatches(); });
+    });
+    d.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>{
+      const a=b.dataset.a;
+      if(a==='del') state.zikars.splice(i,1);
+      else if(a==='up'&&i>0) [state.zikars[i-1],state.zikars[i]]=[state.zikars[i],state.zikars[i-1]];
+      else if(a==='down'&&i<state.zikars.length-1) [state.zikars[i+1],state.zikars[i]]=[state.zikars[i],state.zikars[i+1]];
+      save(); renderList(); refreshStage();
+    }));
+    host.appendChild(d);
+  });
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+$('add').onclick = ()=>{ state.zikars.push({ar:'',tr:'',en:'',count:15,theme:'auto'}); save(); renderList(); refreshStage(); };
+[['brand','input','value'],['beat','input','value'],['res','change','value'],['look','change','value'],['font','change','value']].forEach(([id,ev])=>{
+  const el=$(id); el.value = state[id];
+  el.addEventListener(ev,()=>{ state[id] = id==='beat' ? (clamp(parseFloat(el.value)||1,0.4,3)) : el.value; save();
+    if(id==='look') buildSwatches();
+    if(id==='font'||id==='brand') ensureFonts().then(refreshStage); else refreshStage(); });
+});
+$('sfx').value = state.sfx; $('sfx').onchange = e=>{ state.sfx = e.target.value; state.sound = state.sfx!=='off'; save(); };
+$('showof').checked = !!state.showof; $('showof').onchange = e=>{ state.showof=e.target.checked; save(); refreshStage(); };
+$('scrub').addEventListener('input',()=>{ if(!running){ updateTime(+$('scrub').value); renderAt(+$('scrub').value); } });
+$('preview').onclick = ()=>{ if(running && !recorder) stopRun(); else run(false); };
+$('record').onclick = ()=>run(true);
+
+function buildStyleUI(){
+  const host = $('sceneTiles'); host.innerHTML = '';
+  [...SCENE_IDS,'mix'].forEach(id=>{
+    const b = document.createElement('button'); b.type='button'; b.className='tile'; b.dataset.id = id;
+    b.innerHTML = `<canvas width="108" height="192"></canvas><span>${id==='mix'?'Mix all scenes':SCENES[id].name}</span>`;
+    b.onclick = ()=>{ state.scene = id; save(); markTiles(); refreshStage(); };
+    host.appendChild(b);
+  });
+  markTiles(); buildSwatches();
+}
+function markTiles(){ document.querySelectorAll('.tile').forEach(b=>b.classList.toggle('on', b.dataset.id===state.scene)); }
+function buildSwatches(){
+  const host = $('swatches'); host.innerHTML = ''; const set = themeSet();
+  const all = state.zikars.every(z=>z.theme===state.zikars[0].theme) ? state.zikars[0].theme : null;
+  const mk = (id,css,title)=>{
+    const b = document.createElement('button'); b.type='button'; b.className='sw'+(id==='auto'?' auto':''); b.title = title;
+    if(css) b.style.background = css;
+    if(String(all)===String(id) || (id==='auto' && (all==null||all==='auto'))) b.classList.add('on');
+    b.onclick = ()=>{ state.zikars.forEach(z=>z.theme = id); save(); renderList(); buildSwatches(); refreshStage(); };
+    host.appendChild(b);
+  };
+  mk('auto',null,'Auto');
+  set.forEach((t,i)=>mk(i,`linear-gradient(135deg,${t.bg[0]} 0%,${t.dark?t.glow:t.bead[1]} 100%)`,t.name));
+}
+function refreshThumbs(){
+  const tiles = [...document.querySelectorAll('.tile canvas')]; if(tiles.length < SCENE_IDS.length+1) return;
+  const z = state.zikars[0], old = SC;
+  SCENE_IDS.forEach((id,k)=>{
+    const cvs = tiles[k], c = cvs.getContext('2d'); SC = cvs.width/VW; c.setTransform(SC,0,0,SC,0,0); c.globalAlpha = 1;
+    drawScene(c,{i:0,z,N:15,themeIdx:themeIndexFor(0,z),sceneId:id},INTRO+7.4*state.beat,1);
+  });
+  const mc = tiles[SCENE_IDS.length], m = mc.getContext('2d'); m.setTransform(1,0,0,1,0,0);
+  const w = mc.width/SCENE_IDS.length;
+  SCENE_IDS.forEach((id,k)=>m.drawImage(tiles[k],k*w,0,w,mc.height,k*w,0,w,mc.height));
+  SC = old;
+}
+buildStyleUI();
+renderList();
+ensureFonts().then(()=>{ refreshStage(); $('scrub').value = 2.2; refreshStage(); });
+refreshStage();
+document.fonts && document.fonts.ready.then(()=>refreshStage());
+</script>
+</body>
+</html>
